@@ -9,22 +9,91 @@ def print_board(board):
             row += (j + " ")
         print(row)
 
-# utility function, determines if the game has been finished
+# utility function, determines if the game is finished
 def game_over(board):
-    #TODO
-    count = 0;
-    for i in board:
-        for j in i:
-            if j == "X":
-                count++
-            elif j == "O":
-                count--
-        if(count == 3 or count == -3):
-            return True
 
-#function evaluates the current position and rates it
+    count = 0 # total piece count
+    for i in range(3):
+        h_count = 0 # horizontal count
+        v_count = 0 # vertical count
+        for j in range(3):
+            # horizontal
+            if board[i][j] == "X":
+                h_count += 1
+                count += 1
+            elif board[i][j] == "O":
+                h_count -= 1
+                count += 1
+            # vertical
+            if board[j][i] == "X":
+                v_count += 1
+            elif board[j][i] == "O":
+                v_count -= 1
+        if h_count == 3 or h_count == -3 or v_count == 3 or v_count == -3:
+            return True 
+
+    if count == 9:
+        return True # if no more positions available
+
+    return False # if the game isn't over
+
+
+# function evaluates the current position
 def evaluate(position):
-    # TODO
+    eval = 0
+    for i in range(3):
+        h_xCount, h_oCount = 0 # horizontal count
+        v_xCount, v_oCount = 0 # vertical count
+        for j in range(3):
+            # checks horizontal
+            if position[i][j] == "X":
+                h_xCount +=1
+            elif position[i][j] == "O":
+                h_oCount += 1
+
+            if position[j][i] == "X":
+                v_xCount += 1
+            elif position[j][i] == "O":
+                v_oCount += 1
+
+        # horizontal analysis X
+        if h_oCount == 0: # row must only consist of X values
+            if h_xCount == 3: # 3 in a row
+                eval += 100
+            elif h_xCount == 2: # 2 in a row
+                eval += 10
+            elif h_xCount == 1: # 1 in a row
+                eval += 1
+        # horizontal analysis O
+        elif h_xCount == 0:
+            if h_oCount == 3:
+                eval -= 100
+            elif h_oCount == 2:
+                eval -= 10
+            elif h_oCount == 1:
+                eval -= 1
+
+        # vertical analysis X
+        if v_oCount == 0: # col must only consist of X values
+            if v_xCount == 3: # 3 in a col
+                eval += 100
+            elif v_xCount == 2: # 2 in a col
+                eval += 10
+            elif v_xCount == 1: # 1 in a col
+                eval += 1
+        # vertical analysis O
+        elif v_xCount == 0:
+            if v_oCount == 3:
+                eval -= 100
+            elif v_oCount == 2:
+                eval -= 10
+            elif v_oCount == 1:
+                eval -= 1
+    return eval
+
+def get_children(position, player):
+    #TODO
+    return position
 
 # function calculates a specified number of moves ahead (depth) 
 # to predict the best move
