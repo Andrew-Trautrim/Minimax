@@ -42,8 +42,10 @@ def game_over(board):
 def evaluate(position):
     eval = 0
     for i in range(3):
-        h_xCount, h_oCount = 0 # horizontal count
-        v_xCount, v_oCount = 0 # vertical count
+        h_xCount = 0 # horizontal count
+        h_oCount = 0
+        v_xCount = 0 # vertical count
+        v_oCount = 0
         for j in range(3):
             # checks horizontal
             if position[i][j] == "X":
@@ -125,10 +127,10 @@ def main():
     board = [["-", "-", "-"], ["-", "-", "-"], ["-", "-", "-"]]
     print_board(board)
     
-    for i in range(9):
+    while not game_over(board):
         x,y = raw_input("Move: ").split()
         board[int(y)][int(x)] = "X"
-        print
         print_board(board)
+        print("Eval: " + str(evaluate(board)))
 
 main()
