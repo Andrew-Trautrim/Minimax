@@ -61,41 +61,54 @@ def evaluate(position):
         # horizontal analysis X
         if h_oCount == 0: # row must only consist of X values
             if h_xCount == 3: # 3 in a row
-                eval += 100
+                eval -= 100
             elif h_xCount == 2: # 2 in a row
-                eval += 10
+                eval -= 10
             elif h_xCount == 1: # 1 in a row
-                eval += 1
+                eval -= 1
         # horizontal analysis O
         elif h_xCount == 0:
             if h_oCount == 3:
-                eval -= 100
+                eval += 100
             elif h_oCount == 2:
-                eval -= 10
+                eval += 10
             elif h_oCount == 1:
-                eval -= 1
+                eval += 1
 
         # vertical analysis X
         if v_oCount == 0: # col must only consist of X values
             if v_xCount == 3: # 3 in a col
-                eval += 100
+                eval -= 100
             elif v_xCount == 2: # 2 in a col
-                eval += 10
+                eval -= 10
             elif v_xCount == 1: # 1 in a col
-                eval += 1
+                eval -= 1
         # vertical analysis O
         elif v_xCount == 0:
             if v_oCount == 3:
-                eval -= 100
+                eval += 100
             elif v_oCount == 2:
-                eval -= 10
+                eval += 10
             elif v_oCount == 1:
-                eval -= 1
+                eval += 1
     return eval
 
-def get_children(position, player):
-    #TODO
-    return position
+def get_children(position, max_player):
+    
+    if max_player:
+        team = "O"
+    else:
+        team = "X"
+    
+    children = [] # empty set to store children
+    for i in range(3):
+        for j in range(3):
+            if position[i][j] != "X" or position[i][j] != "O":
+                child = position
+                child[i][j] = team
+                children.append(child)
+
+    return children
 
 # function calculates a specified number of moves ahead (depth) 
 # to predict the best move
