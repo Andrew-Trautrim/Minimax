@@ -38,61 +38,73 @@ def game_over(board):
 
     return False # if the game isn't over
 
+# utility function, values a  given count
+def evaluate_count(count):
+    value = 0
+
+    if count == 1: # Xs
+        value -= 1
+    elif count == 2:
+        value -= 10
+    elif count == 3:
+        value -= 100
+    elif count == 4: # Os
+        value += 1
+    elif count == 8:
+        value += 10
+    elif count == 12:
+        value += 100
+
+    return value
 
 # function evaluates the current position
 def evaluate(position):
-    e = 0 # position value
+    value = 0 # position value
+
+    ldCount = 0 # left diagonal
+    rdCount = 0 # right diagonal
     for i in range(3):
-        h_xCount = 0 # horizontal count
-        h_oCount = 0
-        v_xCount = 0 # vertical count
-        v_oCount = 0
+        hCount = 0 # horizontal count
+        vCount = 0 # vertical count
         for j in range(3):
             # checks horizontal
             if position[i][j] == "X":
-                h_xCount += 1
+                hCount += 1
             elif position[i][j] == "O":
-                h_oCount += 1
+                hCount += 4
 
+            # checks vertical
             if position[j][i] == "X":
-                v_xCount += 1
+                vCount += 1
             elif position[j][i] == "O":
-                v_oCount += 1
+                vCount += 4
 
-        # horizontal analysis X
-        if h_oCount == 0: # row must only consist of X values
-            if h_xCount == 3: # 3 in a row
-                e -= 100
-            elif h_xCount == 2: # 2 in a row
-                e -= 10
-            elif h_xCount == 1: # 1 in a row
-                e -= 1
-        # horizontal analysis O
-        elif h_xCount == 0:
-            if h_oCount == 3:
-                e += 100
-            elif h_oCount == 2:
-                e += 10
-            elif h_oCount == 1:
-                e += 1
+            # checks left diagonal
+            if i == j:
+                if position[i][j] == "X":
+                    ldCount += 1
+                elif position[i][j] == "O":
+                    ldCount += 4
 
-        # vertical analysis X
-        if v_oCount == 0: # col must only consist of X values
-            if v_xCount == 3: # 3 in a col
-                e -= 100
-            elif v_xCount == 2: # 2 in a col
-                e -= 10
-            elif v_xCount == 1: # 1 in a col
-                e -= 1
-        # vertical analysis O
-        elif v_xCount == 0:
-            if v_oCount == 3:
-                e += 100
-            elif v_oCount == 2:
-                e += 10
-            elif v_oCount == 1:
-                e += 1
-    return e
+            if i == 2 - j:
+                if position[i][j] == "X":
+                    rdCount += 1
+                elif position[i][j] == "O":
+                    rdCount += 4
+
+        # horizontal analysis
+        value += evaluate_count(hCount)
+
+        # vertical analysis
+        value += evaluate_count(vCount)
+    
+    # left diagonal analysis
+    value += evaluate_count(ldCount)
+
+    # right diagonal analysis
+    value += evaluate_count(rdCount)
+
+    return value
 
 def get_children(position, max_player):
     
@@ -128,7 +140,7 @@ def minimax(position, depth, max_player):
             # compares the current evaluation to the one calculated
             if evaluation > max_eval:
                 max_eval = evaluation
-                max_pos = pos
+                max_pos = child
         return max_pos
 
     else:
@@ -141,7 +153,7 @@ def minimax(position, depth, max_player):
             # compares the current evaluation to the one calculated
             if evaluation < min_eval:
                 min_eval = evaluation
-                min_pos = pos
+                min_pos = child
         return min_pos
 
 def main(): 
@@ -151,7 +163,7 @@ def main():
     x,y = raw_input("Move: ").split()
     board[int(y)][int(x)] = "X"
     print_board(board)
-    move = minimax(board, 3, True)
+    move = minimax(board, 10, True)
     print_board(move)
 
 main()
