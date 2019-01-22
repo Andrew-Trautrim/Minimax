@@ -13,6 +13,8 @@ def print_board(board):
 # utility function, determines if the game is finished
 def game_over(board):
 
+    ld_count = 0
+    rd_count = 0
     count = 0 # total piece count
     for i in range(3):
         h_count = 0 # horizontal count
@@ -30,8 +32,23 @@ def game_over(board):
                 v_count += 1
             elif board[j][i] == "O":
                 v_count -= 1
+            # left diagonal
+            if i == j:
+                if board[i][j] == "X":
+                    ld_count += 1
+                elif board[i][j] == "O":
+                    ld_count -= 1
+            # right diagonal
+            if i == 2 - j:
+                if board[i][j] == "X":
+                    rd_count += 1
+                elif board[i][j] == "O":
+                    rd_count -=1
+
         if h_count == 3 or h_count == -3 or v_count == 3 or v_count == -3:
             return True
+    if ld_count == 3 or ld_count == -3 or rd_count == 3 or rd_count == -3:
+        return True
 
     if count == 9:
         return True # if no more positions available
@@ -61,51 +78,50 @@ def evaluate_count(count):
 def evaluate(position):
     value = 0 # position value
 
-    ldCount = 0 # left diagonal
-    rdCount = 0 # right diagonal
+    ld_count = 0 # left diagonal
+    rd_count = 0 # right diagonal
     for i in range(3):
-        hCount = 0 # horizontal count
-        vCount = 0 # vertical count
+        h_count = 0 # horizontal count
+        v_count = 0 # vertical count
         for j in range(3):
             # checks horizontal
             if position[i][j] == "X":
-                hCount += 1
+                h_count += 1
             elif position[i][j] == "O":
-                hCount += 4
+                h_count += 4
 
             # checks vertical
             if position[j][i] == "X":
-                vCount += 1
+                v_count += 1
             elif position[j][i] == "O":
-                vCount += 4
+                v_count += 4
 
             # checks left diagonal
             if i == j:
                 if position[i][j] == "X":
-                    ldCount += 1
+                    ld_count += 1
                 elif position[i][j] == "O":
-                    ldCount += 4
+                    ld_count += 4
 
             if i == 2 - j:
                 if position[i][j] == "X":
-                    rdCount += 1
+                    rd_count += 1
                 elif position[i][j] == "O":
-                    rdCount += 4
+                    rd_count += 4
 
         # horizontal analysis
-        value += evaluate_count(hCount)
-
+        value += evaluate_count(h_count)
         # vertical analysis
-        value += evaluate_count(vCount)
+        value += evaluate_count(v_count)
     
     # left diagonal analysis
-    value += evaluate_count(ldCount)
-
+    value += evaluate_count(ld_count)
     # right diagonal analysis
-    value += evaluate_count(rdCount)
+    value += evaluate_count(rd_count)
 
     return value
 
+# calculates all possible moves from current position
 def get_children(position, max_player):
     
     if max_player:
@@ -129,7 +145,8 @@ def minimax(position, depth, max_player):
 
     if depth == 0 or game_over(position):
         return position
-    
+   
+    # if current turn is maximizing player
     if max_player:
         max_eval = -1 * inf
         children = get_children(position, max_player)
@@ -143,6 +160,7 @@ def minimax(position, depth, max_player):
                 max_pos = child
         return max_pos
 
+    # current turn is minimizign player
     else:
         min_eval = inf
         children = get_children(position, max_player)
@@ -160,10 +178,29 @@ def main():
     board = [["-", "-", "-"], ["-", "-", "-"], ["-", "-", "-"]]
     print_board(board)
     
-    x,y = raw_input("Move: ").split()
-    board[int(y)][int(x)] = "X"
-    print_board(board)
-    move = minimax(board, 10, True)
-    print_board(move)
+    while not game_over(board):
+        x = -1
+        y = -1
+        while True:
+            x_pos, y_pos = raw_input("Move: ").split()
+            x = int(x_pos) - 1
+            y = int(y_pos) - 1
+            if (x < 0 or x > 2) or (y < 0 or y > 2):
+                print
+                print "Out of bounds"
+                continue
+            elif board[y][x] != "-":
+                print
+                print "Invalid position"
+                continue
+            break
+
+        board[y][x] = "X"
+        print_board(board)
+        print
+
+        board = minimax(board, 10, True)
+        print_board(board)
+        print
 
 main()
