@@ -1,4 +1,5 @@
 #!/usr/bin/python
+
 inf = 999 # infinity
 
 # displays current bard position
@@ -104,12 +105,9 @@ def get_children(position, max_player):
     for i in range(3):
         for j in range(3):
             if position[i][j] != "X" and position[i][j] != "O":
-                child = position
+                child = [row[:] for row in position]
                 child[i][j] = team
                 children.append(child)
-                print_board(child)
-                print
-                child[i][j] = "-"
 
     return children
 
