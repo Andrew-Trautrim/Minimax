@@ -30,7 +30,7 @@ def game_over(board):
             elif board[j][i] == "O":
                 v_count -= 1
         if h_count == 3 or h_count == -3 or v_count == 3 or v_count == -3:
-            return True 
+            return True
 
     if count == 9:
         return True # if no more positions available
@@ -40,7 +40,7 @@ def game_over(board):
 
 # function evaluates the current position
 def evaluate(position):
-    eval = 0
+    e = 0 # position value
     for i in range(3):
         h_xCount = 0 # horizontal count
         h_oCount = 0
@@ -49,7 +49,7 @@ def evaluate(position):
         for j in range(3):
             # checks horizontal
             if position[i][j] == "X":
-                h_xCount +=1
+                h_xCount += 1
             elif position[i][j] == "O":
                 h_oCount += 1
 
@@ -61,37 +61,37 @@ def evaluate(position):
         # horizontal analysis X
         if h_oCount == 0: # row must only consist of X values
             if h_xCount == 3: # 3 in a row
-                eval -= 100
+                e -= 100
             elif h_xCount == 2: # 2 in a row
-                eval -= 10
+                e -= 10
             elif h_xCount == 1: # 1 in a row
-                eval -= 1
+                e -= 1
         # horizontal analysis O
         elif h_xCount == 0:
             if h_oCount == 3:
-                eval += 100
+                e += 100
             elif h_oCount == 2:
-                eval += 10
+                e += 10
             elif h_oCount == 1:
-                eval += 1
+                e += 1
 
         # vertical analysis X
         if v_oCount == 0: # col must only consist of X values
             if v_xCount == 3: # 3 in a col
-                eval -= 100
+                e -= 100
             elif v_xCount == 2: # 2 in a col
-                eval -= 10
+                e -= 10
             elif v_xCount == 1: # 1 in a col
-                eval -= 1
+                e -= 1
         # vertical analysis O
         elif v_xCount == 0:
             if v_oCount == 3:
-                eval += 100
+                e += 100
             elif v_oCount == 2:
-                eval += 10
+                e += 10
             elif v_oCount == 1:
-                eval += 1
-    return eval
+                e += 1
+    return e
 
 def get_children(position, max_player):
     
@@ -103,10 +103,13 @@ def get_children(position, max_player):
     children = [] # empty set to store children
     for i in range(3):
         for j in range(3):
-            if position[i][j] != "X" or position[i][j] != "O":
+            if position[i][j] != "X" and position[i][j] != "O":
                 child = position
                 child[i][j] = team
                 children.append(child)
+                print_board(child)
+                print
+                child[i][j] = "-"
 
     return children
 
@@ -115,35 +118,42 @@ def get_children(position, max_player):
 def minimax(position, depth, max_player):
 
     if depth == 0 or game_over(position):
-        return evaluate(position)
-
+        return position
+    
     if max_player:
         max_eval = -1 * inf
         children = get_children(position, max_player)
+        max_pos = children[0] # set to first possible move
         for child in children:
-            evaluation = minimax(child, depth-1, false)
+            pos = minimax(child, depth-1, False)
+            evaluation = evaluate(pos)
             # compares the current evaluation to the one calculated
-            max_eval = max(max_eval, evaluation)
-        return max_eval
+            if evaluation > max_eval:
+                max_eval = evaluation
+                max_pos = pos
+        return max_pos
 
     else:
         min_eval = inf
-        children = get_children(poition, max_player)
+        children = get_children(position, max_player)
+        min_pos = children[0] # set to the first possible move
         for child in children:
-            evaluation = minimax(child, depth-1, true)
+            pos = minimax(child, depth-1, True)
+            evaluation = evaluate(pos)
             # compares the current evaluation to the one calculated
-            min_eval = min(min_eval, evaluation)
-        return minEval
-
+            if evaluation < min_eval:
+                min_eval = evaluation
+                min_pos = pos
+        return min_pos
 
 def main(): 
     board = [["-", "-", "-"], ["-", "-", "-"], ["-", "-", "-"]]
     print_board(board)
     
-    while not game_over(board):
-        x,y = raw_input("Move: ").split()
-        board[int(y)][int(x)] = "X"
-        print_board(board)
-        print("Eval: " + str(evaluate(board)))
+    x,y = raw_input("Move: ").split()
+    board[int(y)][int(x)] = "X"
+    print_board(board)
+    move = minimax(board, 3, True)
+    print_board(move)
 
 main()
